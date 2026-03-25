@@ -1,0 +1,39 @@
+drone(1).position = [0 0];
+drone(1).target = [0 0];
+drone(1).has_target = false;
+drone(1).water_level = 5;
+drone(1).logs = {};
+
+function makeDrone(droneIndex)
+drone(droneIndex).position = [0 0];
+drone(droneIndex).target = [0 0];
+drone(droneIndex).has_target = false;
+drone(droneIndex).water_level = 5;
+drone(droneIndex).logs = {};
+end
+
+function newFireGrid = drone_update(drone, fire, params)
+if(drone)
+%{
+    If drone water level is 0
+		Set target to water re-fill location (maybe like(40,40) since the fire starts at (0,0)?)
+		Return the same fire as inputted
+	If drone doesn't have target:
+		Highest priority fire score = 0
+		Highest priority fire cell= [0,0]
+		%% The for loop just finds a fire cell with high intensity that's also close by
+		For fire cell in  fire:
+			Fire score = distance from drone * fire intensity
+			If fire score > highest priority fire score
+				Highest priority fire score = fire score
+				Highest priority fire cell = fire cell
+		Drone target = highest priority fire cell
+	
+	
+	Move drone towards the target by the drone flight rate parameter (# of cells per update)
+	If (the drone is on top of a fire cell with an intensity >= ¼ of its target's intensity
+AND the drone still has more than 1 water left) 
+OR the drone is on top of its target
+		Use up one water to douse the current fire cell
+%}
+end
