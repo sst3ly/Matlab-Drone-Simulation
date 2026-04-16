@@ -28,16 +28,34 @@ if(~drone.has_target)
     highestPriorityFireScore = 0;
     drone.target = params.water_tank_position;
     droneFurthestTarget = norm([size(fire,1), size(fire,2)] - [1,1]);
+
+    % get base scores
     for xi=1:size(fire, 1)
         for yi=1:size(fire, 2)
-            fireScore = (droneFurthestTarget - norm([xi, yi] - drone.position)) * fire(xi, yi);
+            base_score = (droneFurthestTarget - norm([xi, yi] - drone.position)) * min(params.strength_threshold, fire(xi, yi));
+
+            neighborScore = 0;
+            for dx = -1:1
+                for dy = -1:1
+                    if dx == 0 && dy == 0
+                        continue;
+                    end
+                    nx = xi + dx;
+                    ny = yi + dy;
+                    
+                    if nx >= 1 && nx <= size(fire, 1) && ny >= 1 && ny <= size(fire, 2)
+                        neighborScore = neighborScore + fire(nx, ny);
+                    end
+                end
+            end
+            fireScore = base_score + neighborScore;
             if(fireScore > highestPriorityFireScore)
                 highestPriorityFireScore = fireScore;
                 drone.target = [xi, yi];
                 drone.has_target = true;
             end
         end
-    end    
+    end 
     % fallback to water tank
     if(~drone.has_target)
         drone.target = params.water_tank_position;
@@ -61,45 +79,14 @@ if isequal(drone.target, params.water_tank_position)
 end
 
 if(drone.has_target)
-    % calculate drone vel
-    droneGoalVelHorz = sign(drone.target(1) - drone.position(1));
-    droneGoalVelVert = sign(drone.target(2) - drone.position(2));
-    % calculate drone move goal
-    droneMoveGoalHorz = drone.position(1) + droneGoalVelHorz;
-    droneMoveGoalVert = drone.position(2) + droneGoalVelVert;
-    
-    % ------- update drone position -------
-    % check collisions
-    collisions = {[], [], []};
-    for di=1:length(drones)
-        if(di == droneIndex) continue; end
-        % if a drone is in the way of this drone
-        % put the move goal blocker in collisions(1)
-        % put a horizontal blocker in collisions(2)
-        % put a vertical blocker in collisions(3)
-        if isequal(drones(di).position, [droneMoveGoalHorz, droneMoveGoalVert])
-            collisions{1} = drones(di);
-        end
-        if (droneGoalVelHorz ~= 0 && isequal(drones(di).position, [droneMoveGoalHorz, drone.position(2)]))
-            collisions{2} = drones(di);
-        end
-        if (droneGoalVelVert ~= 0 && isequal(drones(di).position, [drone.position(1), droneMoveGoalVert]))
-            collisions{3} = drones(di);
-        end
-    end
-    % move if possible
-    if isempty(collisions{1})
-        drone.position = [droneMoveGoalHorz, droneMoveGoalVert];
+    bfs_path = bfs_pathfind(drone.position, drone.target, drones, droneIndex, params.grid_size);
+
+    if(size(bfs_path, 1) > 1)
+        drone.position = bfs_path(2,:);
     else
-        if isempty(collisions{2}) && droneGoalVelHorz ~= 0
-            drone.position(1) = droneMoveGoalHorz;
-        elseif isempty(collisions{3}) && droneGoalVelVert ~= 0
-            drone.position(2) = droneMoveGoalVert;
-        else
-            % unable to move anywhere
-        end
+        drone.target = randi(params.grid_size, 1, 2);
     end
-    
+
     % bounds checking
     drone.position(1) = max(1, min(size(fire, 1), drone.position(1)));
     drone.position(2) = max(1, min(size(fire, 2), drone.position(2)));
@@ -107,7 +94,21 @@ end
 
 % ------- douse fire -------
 if (drone.water_level >= 1 && isequal(drone.position, drone.target) || (drone.water_level > 1 && fire(drone.position(1), drone.position(2)) >= 0.25))
+    
     fire(drone.position(1), drone.position(2)) = 0;
+    if(drone.position(1) > 1)
+        fire(drone.position(1) - 1, drone.position(2)) = max(0, fire(drone.position(1) - 1, drone.position(2)) - 0.5);
+    end
+    if(drone.position(1) < params.grid_size - 2)
+        fire(drone.position(1) + 1, drone.position(2)) = max(0, fire(drone.position(1) + 1, drone.position(2)) - 0.5);
+    end
+    if(drone.position(2) > 1)
+        fire(drone.position(1), drone.position(2) - 1) = max(0, fire(drone.position(1), drone.position(2) - 1) - 0.5);
+    end
+    if(drone.position(2) < params.grid_size - 2)
+        fire(drone.position(1), drone.position(2) + 1) = max(0, fire(drone.position(1), drone.position(2) + 1) - 0.5);
+    end
+
     drone.water_level = drone.water_level - 1;
     if isequal(drone.position, drone.target)
         drone.has_target = false;
