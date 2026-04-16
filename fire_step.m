@@ -27,7 +27,7 @@ new_fire = tiles;
 % 
 for x = 1 : length(tiles)
     for y = 1 : length(tiles)
-        if tiles(x,y) > param.strength_threshold
+        if tiles(x,y) > params.strength_threshold
             if x > 1
                 new_fire(x-1,y) = tiles(x-1,y) + params.spread_rate;
                 new_fire(x-1,y) = min(1,new_fire(x-1,y));

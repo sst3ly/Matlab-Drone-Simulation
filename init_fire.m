@@ -8,6 +8,7 @@ arguments (Output)
     tiles
 end
 
+rng(params.random_seed)
 
 % ------- Create Grid -------
 % makes an X sized grid with all values zero for inital intenisty
