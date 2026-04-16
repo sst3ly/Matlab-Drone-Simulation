@@ -43,6 +43,23 @@ for x = 1 : length(tiles)
             if y < params.grid_size - 1
                 new_fire(x,y+1) = tiles(x,y+1) + params.spread_rate;
                 new_fire(x,y+1) = min(1,new_fire(x,y+1));
+% ------- Diagonal Spread -------
+            if rand > params.diag_prob && x > 1 && y > 1
+                new_fire(x-1,y-1) = tiles(x-1,y-1) + params.spread_rate;
+                new_fire(x-1,y-1) = min(1,new_fire(x-1,y-1));
+            end
+            if rand > params.diag_prob && x < params.grid_size - 1 && y > 1
+                new_fire(x+1,y-1) = tiles(x+1,y-1) + params.spread_rate;
+                new_fire(x+1,y-1) = min(1,new_fire(x+1,y-1));
+            end
+            if rand > params.diag_prob && x > 1 && y < params.grid_size - 1
+                new_fire(x-1,y+1) = tiles(x-1,y+1) + params.spread_rate;
+                new_fire(x-1,y+1) = min(1,new_fire(x-1,y+1));
+            end
+            if rand > params.diag_prob && x < params.grid_size && y < params.grid_size
+                new_fire(x+1,y+1) = tiles(x+1,y+1) + params.spread_rate;
+                new_fire(x+1,y+1) = min(1,new_fire(x+1,y+1));
+            end
             end
         end
     end
