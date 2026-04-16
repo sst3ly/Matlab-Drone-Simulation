@@ -21,29 +21,30 @@ for x = 1 : length(tiles)
     end
 end
 
+new_fire = tiles;
+
 % ------- Spread -------
 % 
 for x = 1 : length(tiles)
     for y = 1 : length(tiles)
-        if tiles(x,y) > 0
-            if x > 2
-            tiles(x-1 , y) = tiles(x-1 , y) + params.spread_rate;
-                tiles(x-1,y) = min(1,tiles(x-1,y));
+        if tiles(x,y) > param.strength_threshold
+            if x > 1
+                new_fire(x-1,y) = tiles(x-1,y) + params.spread_rate;
+                new_fire(x-1,y) = min(1,new_fire(x-1,y));
             end
             if x < params.grid_size - 1
-            tiles(x+1 , y) = tiles(x+1 , y) + params.spread_rate;
-                tiles(x+1,y) = min(1,tiles(x+1,y));
+                new_fire(x+1,y) = tiles(x+1,y) + params.spread_rate;
+                new_fire(x+1,y) = min(1,new_fire(x+1,y));
             end
-            if y > 2
-            tiles(x , y-1) = tiles(x , y-1) + params.spread_rate;
-                tiles(x,y-1) = min(1,tiles(x,y-1));
+            if y > 1
+                new_fire(x,y-1) = tiles(x,y-1) + params.spread_rate;
+                new_fire(x,y-1) = min(1,new_fire(x,y-1));
             end
             if y < params.grid_size - 1
-            tiles(x , y+1) = tiles(x , y+1) + params.spread_rate;
-                tiles(x,y+1) = min(1,tiles(x,y+1));
+                new_fire(x,y+1) = tiles(x,y+1) + params.spread_rate;
+                new_fire(x,y+1) = min(1,new_fire(x,y+1));
             end
         end
     end
-    new_fire = tiles;
 end
         
