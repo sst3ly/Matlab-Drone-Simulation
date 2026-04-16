@@ -26,19 +26,19 @@ end
 for x = 1 : length(tiles)
     for y = 1 : length(tiles)
         if tiles(x,y) > 0
-            if x < 2
+            if x > 2
             tiles(x-1 , y) = tiles(x-1 , y) + params.spread_rate;
                 tiles(x-1,y) = min(1,tiles(x-1,y));
             end
-            if x > params.grid_size - 1
+            if x < params.grid_size - 1
             tiles(x+1 , y) = tiles(x+1 , y) + params.spread_rate;
                 tiles(x+1,y) = min(1,tiles(x+1,y));
             end
-            if y < 2
+            if y > 2
             tiles(x , y-1) = tiles(x , y-1) + params.spread_rate;
                 tiles(x,y-1) = min(1,tiles(x,y-1));
             end
-            if y > params.grid_size - 1
+            if y < params.grid_size - 1
             tiles(x , y+1) = tiles(x , y+1) + params.spread_rate;
                 tiles(x,y+1) = min(1,tiles(x,y+1));
             end

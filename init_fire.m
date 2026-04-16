@@ -11,7 +11,7 @@ end
 
 % ------- Create Grid -------
 % makes an X sized grid with all values zero for inital intenisty
-tiles = Zeros(params.grid_size);
+tiles = zeros(params.grid_size);
 
 % -------  -------
 % 
