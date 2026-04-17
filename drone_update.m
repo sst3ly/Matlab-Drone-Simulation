@@ -74,6 +74,7 @@ if isequal(drone.target, params.water_tank_position)
     % drone reached water tank
     if isequal(drone.position, params.water_tank_position)
         drone.water_level = params.max_drone_water;
+        drone.times_refilled = drone.times_refilled + 1;
         drone.has_target = false;
     end
 end
@@ -83,6 +84,12 @@ if(drone.has_target)
 
     if(size(bfs_path, 1) > 1)
         drone.position = bfs_path(2,:);
+        mov = drone.position - bfs_path(2,:);
+        if(mov(2) == 0 || mov(1) == 0)
+            drone.distance_travelled = drone.distance_travelled + 1;
+        else
+            drone.distance_travelled = drone.distance_travelled + 1.41421; % estimate for sqrt(2)
+        end
     else
         drone.target = randi(params.grid_size, 1, 2);
     end
@@ -110,6 +117,7 @@ if (drone.water_level >= 1 && isequal(drone.position, drone.target) || (drone.wa
     end
 
     drone.water_level = drone.water_level - 1;
+    drone.fire_cells_extinguished = drone.fire_cells_extinguished + 1;
     if isequal(drone.position, drone.target)
         drone.has_target = false;
     end

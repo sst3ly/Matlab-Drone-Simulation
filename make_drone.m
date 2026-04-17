@@ -6,7 +6,10 @@ for n=1:numdrones
     drone(n).target = [1 1];
     drone(n).has_target = false;
     drone(n).water_level = 5;
-    drone(n).logs = {};
+    % statistics
+    drone(n).fire_cells_extinguished = 0;
+    drone(n).distance_travelled = 0;
+    drone(n).times_refilled = 0;
 end
 
 end
